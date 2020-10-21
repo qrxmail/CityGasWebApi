@@ -30,6 +30,11 @@ namespace CityGasWebApi.Models.Task
         public string OperContent { get; set; }
 
         /// <summary>
+        /// 操作类型
+        /// </summary>
+        public string OperType { get; set; }
+
+        /// <summary>
         /// 操作时间
         /// </summary>
         public DateTime OperTime { get; set; }

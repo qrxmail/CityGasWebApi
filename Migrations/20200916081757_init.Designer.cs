@@ -3,15 +3,17 @@ using System;
 using CityGasWebApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace CityGasWebApi.Migrations
 {
     [DbContext(typeof(CityGasContext))]
-    partial class CityGasContextModelSnapshot : ModelSnapshot
+    [Migration("20200916081757_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -157,62 +159,6 @@ namespace CityGasWebApi.Migrations
                     b.HasKey("GId");
 
                     b.ToTable("Device");
-                });
-
-            modelBuilder.Entity("CityGasWebApi.Models.User", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Avatar")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Branch")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreateTime")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("CreateUser")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CurrentAuthority")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("LastUpdateTime")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("LastUpdateUser")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Mobile")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Password")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Remark")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Type")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("text");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("User");
                 });
 #pragma warning restore 612, 618
         }

@@ -24,7 +24,7 @@ namespace CityGasWebApi.Controllers
         // 带多个查询条件的查询
         [Route("query")]
         [HttpGet]
-        public ActionResult<TableDataDevice> Query(string queryStr)
+        public ActionResult<TableData> Query(string queryStr)
         {
 
             //var queryObj = new Device();
@@ -51,16 +51,8 @@ namespace CityGasWebApi.Controllers
                          select new DeviceView
                          {
                              GId = device.GId,
-                             //DeviceNo = device.DeviceNo,
-                             //Site = device.Site,
-                             //Region = device.Region,
-                             //InspectNo = device.InspectNo,
                              DeviceType = device.DeviceType,
                              DeviceName = device.DeviceName,
-                             //Longitude = device.Longitude,
-                             //Latitude = device.Latitude,
-                             //BaiduLongitude = device.BaiduLongitude,
-                             //BaiduLatitude = device.BaiduLatitude,
                              Remark = device.Remark,
                              CreateTime = device.CreateTime,
                              CreateUser = device.CreateUser,
@@ -128,7 +120,7 @@ namespace CityGasWebApi.Controllers
             //获取结果
             List<DeviceView> dataList = where.Take(pageSize).ToList();
 
-            TableDataDevice resultObj = new TableDataDevice();
+            TableData resultObj = new TableData();
             resultObj.Data = dataList;
             resultObj.Current = current;
             resultObj.Success = true;
@@ -243,9 +235,9 @@ namespace CityGasWebApi.Controllers
         [HttpPost]
         public IActionResult Delete(DelObj delObj)
         {
-            for (int i =0;i< delObj.gId.Count(); i++)
+            for (int i =0;i< delObj.Id.Count(); i++)
             {
-                var obj = _context.Device.Find(delObj.gId[i]);
+                var obj = _context.Device.Find(delObj.Id[i]);
                 if (obj == null)
                 {
                     return NotFound();
@@ -265,8 +257,8 @@ namespace CityGasWebApi.Controllers
         {
             List<User> userList = new List<User>();
             User user1 = new User();
-            user1.userid = "00000001";
-            user1.name = "admin";
+            user1.UserId = Guid.NewGuid();
+            user1.Name = "admin";
             userList.Add(user1);
 
             return userList;
@@ -305,5 +297,7 @@ namespace CityGasWebApi.Controllers
             /// </summary>
             public string InspectName { get; set; }
         }
+
+
     }
 }

@@ -1,5 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Text;
+using System.Collections.Generic;
+using System.Linq;
+using CityGasWebApi.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CityGasWebApi.Controllers
 {
@@ -7,6 +14,13 @@ namespace CityGasWebApi.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+        private readonly CityGasContext _context;
+
+        public UserController(CityGasContext context)
+        {
+            _context = context;
+        }
+
         /// <summary>
         /// 获取当前登录用户
         /// </summary>
@@ -15,15 +29,20 @@ namespace CityGasWebApi.Controllers
         [HttpGet]
         public ActionResult<User> GetCurrentUser()
         {
-            User currentUser = new User();
-            currentUser.name = "admin";
-            currentUser.avatar = "https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png";
-            currentUser.userid = "00000001";
-            currentUser.email = "qrxmail@126.com";
-            currentUser.title = "全栈";
-            currentUser.group = "清铭宇自动化";
-
-            return currentUser;
+            byte[] currentUserByte = HttpContext.Session.Get("currentUser");
+            string currentUserStr = currentUserByte == null ? null: Encoding.UTF8.GetString(currentUserByte);
+            if (string.IsNullOrEmpty(currentUserStr) == false)
+            {
+                User currentUser = JsonConvert.DeserializeObject<User>(currentUserStr);
+                return currentUser;
+            }
+            else
+            {
+                User currentUser = new User();
+                currentUser.Status = "error";
+                currentUser.CurrentAuthority = "guest";
+                return currentUser;
+            }
         }
 
         /// <summary>
@@ -33,13 +52,239 @@ namespace CityGasWebApi.Controllers
         /// <returns></returns>
         [Route("login/account")]
         [HttpPost]
-        public ActionResult<User> Login(LoginUser loginUser)
+        public ActionResult<User> Login(User loginInfo)
         {
-            User user = new User();
-            user.status = "ok";
-            user.type = "account";
-            user.currentAuthority = "admin";
-            return user;
+            User loginUser = new User();
+            List<User> userList = _context.User.Where(p => p.UserName.Equals(loginInfo.UserName) && p.Password.Equals(loginInfo.Password)).ToList();
+            if (userList.Count > 0)
+            {
+                loginUser = userList.First();
+                loginUser.Status = "ok";
+                loginUser.Type = "account";
+                var loginUserBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(loginUser));
+                HttpContext.Session.Set("currentUser", loginUserBytes);
+            }
+            
+            else
+            {  
+                loginUser.Status = "error";
+                loginUser.Type = "account";
+                loginUser.CurrentAuthority = "guest";
+            }
+            return loginUser;
+        }
+
+        /// <summary>
+        /// 登出功能
+        /// </summary>
+        /// <returns></returns>
+        [Route("login/out")]
+        [HttpGet]
+        public ActionResult<User> LoginOut()
+        {
+            User loginUser = new User();
+            loginUser.Status = "ok";
+            HttpContext.Session.Remove("currentUser");
+            return loginUser;
+        }
+
+        // 带多个查询条件的查询
+        [Route("user/query")]
+        [HttpGet]
+        public ActionResult<TableData> Query(string queryStr)
+        {
+            JObject jObject = new JObject();
+            if (string.IsNullOrEmpty(queryStr) == false)
+            {
+                jObject = JsonConvert.DeserializeObject<JObject>(queryStr);
+            }
+
+            int current = jObject.Value<int>("current") == 0 ? 1 : jObject.Value<int>("current");
+            int pageSize = jObject.Value<int>("pageSize") == 0 ? 20 : jObject.Value<int>("pageSize");
+            string userName = jObject.Value<string>("userName");
+
+            //防止查询条件都不满足，先生成一个空的查询
+            var where = _context.User.Where(p => true);
+
+            if (string.IsNullOrEmpty(userName) == false)
+            {
+                where = where.Where(p => p.UserName.Contains(userName));
+            }
+
+            //统计总记录数
+            int total = where.Count();
+
+            // 解析排序规则
+            string sorterKey = "";
+            string sortRule = "";
+            JObject sorterObj = jObject.Value<JObject>("sorter");
+            IEnumerable<JProperty> properties = sorterObj.Properties();
+            foreach (JProperty item in properties)
+            {
+                sorterKey = item.Name;
+                sortRule = item.Value.ToString();
+            }
+            if (string.IsNullOrEmpty(sorterKey) == false && string.IsNullOrEmpty(sortRule) == false)
+            {
+                if (sorterKey.Equals("userName") && sortRule.Equals("descend"))
+                {
+                    where = where.OrderByDescending(p => p.UserName);
+                }
+                else if (sorterKey.Equals("userName") && sortRule.Equals("ascend"))
+                {
+                    where = where.OrderBy(p => p.UserName);
+                }
+                // 按照最后更新时间排序
+                if (sorterKey.Equals("lastUpdateTime") && sortRule.Equals("descend"))
+                {
+                    where = where.OrderByDescending(p => p.LastUpdateTime);
+                }
+                else if (sorterKey.Equals("lastUpdateTime") && sortRule.Equals("ascend"))
+                {
+                    where = where.OrderBy(p => p.LastUpdateTime);
+                }
+            }
+            else
+            {
+                //结果按照最后修改时间倒序排序
+                where = where.OrderByDescending(p => p.LastUpdateTime);
+            }
+
+            //跳过翻页的数量
+            where = where.Skip(pageSize * (current - 1));
+            //获取结果
+            List<User> dataList = where.Take(pageSize).ToList();
+
+            TableData resultObj = new TableData();
+            resultObj.Data = dataList;
+            resultObj.Current = current;
+            resultObj.Success = true;
+            resultObj.PageSize = pageSize;
+            resultObj.Total = total;
+
+            return resultObj;
+        }
+
+        // 根据id查询
+        [Route("user/getbyid")]
+        [HttpGet(Name = "GetUserObj")]
+        public ActionResult<User> GetById(Guid gid)
+        {
+            var item = _context.User.Find(gid);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            return item;
+        }
+
+        // 判断是否存在相同登录名的用户
+        [Route("user/isexistsamename")]
+        public bool IsExistSameName(User obj)
+        {
+            var where = _context.User.Where(p => p.UserName == obj.UserName);
+            if (obj.UserId != null)
+            {
+                where = where.Where(p => p.UserId != obj.UserId);
+            }
+            List<User> list = where.ToList();
+            if (list.Count > 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        // 新增
+        [Route("user/add")]
+        [HttpPost]
+        public ResultObj Add(User obj)
+        {
+            ResultObj resultObj = new ResultObj();
+            if (IsExistSameName(obj))
+            {
+                resultObj.IsSuccess = false;
+                resultObj.ErrMsg = "该登录名已存在。";
+                return resultObj;
+            }
+
+            obj.CreateUser = GetCurrentUser().Value.UserName;
+            obj.CreateTime = DateTime.Now;
+            obj.LastUpdateUser = obj.LastUpdateUser;
+            obj.LastUpdateTime = DateTime.Now;
+
+            _context.User.Add(obj);
+            _context.SaveChanges();
+
+            resultObj.IsSuccess = true;
+            return resultObj;
+        }
+
+        // 修改
+        [Route("user/update")]
+        [HttpPost]
+        public ResultObj Update(User newObj)
+        {
+            ResultObj resultObj = new ResultObj();
+
+            var obj = _context.User.Find(newObj.UserId);
+            if (obj == null)
+            {
+                resultObj.IsSuccess = false;
+                resultObj.ErrMsg = "修改对象不存在。";
+                return resultObj;
+            }
+
+            if (IsExistSameName(newObj))
+            {
+                resultObj.IsSuccess = false;
+                resultObj.ErrMsg = "该登录名已存在。";
+                return resultObj;
+            }
+
+            obj.UserName = newObj.UserName;
+            obj.Password = newObj.Password;
+            obj.Branch = newObj.Branch;
+            obj.Name = newObj.Name;
+            obj.Type = newObj.Type;
+            obj.Avatar = newObj.Avatar;
+            obj.Email = newObj.Email;
+            obj.Mobile = newObj.Mobile;
+            obj.Status = newObj.Status;
+            obj.CurrentAuthority = newObj.CurrentAuthority;
+            obj.Remark = newObj.Remark;
+
+            obj.LastUpdateTime = DateTime.Now;
+            obj.LastUpdateUser = GetCurrentUser().Value.UserName; 
+
+            _context.User.Update(obj);
+            _context.SaveChanges();
+
+            resultObj.IsSuccess = true;
+            return resultObj;
+        }
+
+        // 删除
+        [Route("user/delete")]
+        [HttpPost]
+        public IActionResult Delete(DelObj delObj)
+        {
+            for (int i = 0; i < delObj.Id.Count(); i++)
+            {
+                var obj = _context.User.Find(delObj.Id[i]);
+                if (obj == null)
+                {
+                    return NotFound();
+                }
+                // 系统管理员或者自己不可以删除
+                if ( !(obj.UserName.Equals("admin") || obj.UserName.Equals(GetCurrentUser().Value.UserName)))
+                {
+                    _context.User.Remove(obj);
+                    _context.SaveChanges();
+                }
+            }
+
+            return NoContent();
         }
 
         /// <summary>
@@ -92,31 +337,6 @@ namespace CityGasWebApi.Controllers
         public List<MenuItem> routes { get; set; }
     }
 
-    /// <summary>
-    /// 登录账户模型
-    /// </summary>
-    public class LoginUser
-    {
-        public string password { get; set; }
-        public string userName { get; set; }
-        public string type { get; set; }
-    }
 
-    /// <summary>
-    /// 用户信息
-    /// </summary>
-    public class User
-    {
-        public string name { get; set; }
-        public string avatar { get; set; }
-        public string userid { get; set; }
-        public string email { get; set; }
-        public string signature { get; set; }
-        public string title { get; set; }
-        public string group { get; set; }
-        public string status { get; set; }
-        public string type { get; set; }
-        public string currentAuthority { get; set; }
 
-    }
 }

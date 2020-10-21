@@ -2,9 +2,13 @@
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://192.168.1.109:59645",
+    "iis": {
+      "applicationUrl": "http://localhost/CityGasWebApi",
       "sslPort": 0
+    },
+    "iisExpress": {
+      "applicationUrl": "http://localhost:44396",
+      "sslPort": 44395
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json",

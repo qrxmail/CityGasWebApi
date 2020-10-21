@@ -3,15 +3,17 @@ using System;
 using CityGasWebApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace CityGasWebApi.Migrations
 {
     [DbContext(typeof(CityGasContext))]
-    partial class CityGasContextModelSnapshot : ModelSnapshot
+    [Migration("20201021032547_addUser")]
+    partial class addUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -187,9 +189,6 @@ namespace CityGasWebApi.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("LastUpdateUser")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Mobile")
                         .HasColumnType("text");
 
                     b.Property<string>("Name")

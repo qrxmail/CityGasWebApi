@@ -13,14 +13,7 @@ namespace CityGasWebApi.Models
         public bool Success { get; set; }
         public int PageSize { get; set; }
         public int Current { get; set; }
-    }
-
-    /// <summary>
-    /// 用来返回设备的列表数据
-    /// </summary>
-    public class TableDataDevice : TableData
-    {
-        public List<DeviceView> Data { get; set; }
+        public dynamic Data { get; set; }
     }
 
     public class DeviceView : Device
@@ -33,7 +26,7 @@ namespace CityGasWebApi.Models
     /// </summary>
     public class DelObj
     {
-        public List<Guid> gId { get; set; }
+        public List<Guid> Id { get; set; }
     }
 
     public class ResultObj

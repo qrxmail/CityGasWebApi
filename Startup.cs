@@ -9,6 +9,8 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.Http;
 
 namespace CityGasWebApi
 {
@@ -22,14 +24,15 @@ namespace CityGasWebApi
         }
 
         public IConfiguration Configuration { get; }
-       
+
 
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc(options => { options.EnableEndpointRouting = false; });
 
+            // 使用PostgreSql数据库
             services.AddDbContext<CityGasContext>(option => option.UseNpgsql(Configuration.GetConnectionString("PostgreSql")));
-            
+
             // 解决时间少8小时的问题
             services.AddControllers().AddJsonOptions(opt =>
             {
@@ -41,19 +44,28 @@ namespace CityGasWebApi
             #region 跨域
             services.AddCors(options =>
             {
-                options.AddPolicy(AllowSpecificOrigin,
-                    builder =>
-                    {
-                        builder.AllowAnyMethod()
-                            .AllowAnyOrigin()
-                            .AllowAnyHeader();
-                    });
+                options.AddPolicy(AllowSpecificOrigin, builder => { builder.AllowAnyMethod().AllowAnyOrigin().AllowAnyHeader(); });
             });
             #endregion
+
+            // 配置session
+            services.AddSession(options =>
+            {
+                options.Cookie.Name = ".AdventureWorks.Session";
+                options.IdleTimeout = TimeSpan.FromSeconds(60 * 120);//设置session的过期时间
+                options.Cookie.HttpOnly = true;//设置在浏览器不能通过js获得该cookie的值
+            });
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddHttpContextAccessor();
+            //HttpContextAccessor 默认实现了它简化了访问HttpContext
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
         public void Configure(IApplicationBuilder app)
         {
+            //使用session
+            app.UseSession();
+
             app.UseRouting();
             //CORS 中间件必须配置为在对 UseRouting 和 UseEndpoints的调用之间执行。 配置不正确将导致中间件停止正常运行。
             app.UseCors(AllowSpecificOrigin);
@@ -61,6 +73,7 @@ namespace CityGasWebApi
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
+
             app.UseMvc();
 
             DefaultFilesOptions defaultFilesOptions = new DefaultFilesOptions();
