@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using CityGasWebApi.Services;
 
 namespace CityGasWebApi.Controllers
 {
@@ -29,26 +30,13 @@ namespace CityGasWebApi.Controllers
         [HttpGet]
         public ActionResult<User> GetCurrentUser()
         {
-            byte[] currentUserByte = HttpContext.Session.Get("currentUser");
-            string currentUserStr = currentUserByte == null ? null: Encoding.UTF8.GetString(currentUserByte);
-            if (string.IsNullOrEmpty(currentUserStr) == false)
-            {
-                User currentUser = JsonConvert.DeserializeObject<User>(currentUserStr);
-                return currentUser;
-            }
-            else
-            {
-                User currentUser = new User();
-                currentUser.Status = "error";
-                currentUser.CurrentAuthority = "guest";
-                return currentUser;
-            }
+            return CommonService.GetCurrentUser(HttpContext);
         }
 
         /// <summary>
         /// 登录功能
         /// </summary>
-        /// <param name="loginUser"></param>
+        /// <param name="loginInfo"></param>
         /// <returns></returns>
         [Route("login/account")]
         [HttpPost]
@@ -179,8 +167,7 @@ namespace CityGasWebApi.Controllers
         }
 
         // 判断是否存在相同登录名的用户
-        [Route("user/isexistsamename")]
-        public bool IsExistSameName(User obj)
+        public bool IsExistSame(User obj)
         {
             var where = _context.User.Where(p => p.UserName == obj.UserName);
             if (obj.UserId != null)
@@ -200,15 +187,17 @@ namespace CityGasWebApi.Controllers
         [HttpPost]
         public ResultObj Add(User obj)
         {
+            // 获取当前登录用户名
+            string _currentUserName = CommonService.GetCurrentUser(HttpContext).UserName;
             ResultObj resultObj = new ResultObj();
-            if (IsExistSameName(obj))
+            if (IsExistSame(obj))
             {
                 resultObj.IsSuccess = false;
                 resultObj.ErrMsg = "该登录名已存在。";
                 return resultObj;
             }
 
-            obj.CreateUser = GetCurrentUser().Value.UserName;
+            obj.CreateUser = _currentUserName;
             obj.CreateTime = DateTime.Now;
             obj.LastUpdateUser = obj.LastUpdateUser;
             obj.LastUpdateTime = DateTime.Now;
@@ -225,6 +214,8 @@ namespace CityGasWebApi.Controllers
         [HttpPost]
         public ResultObj Update(User newObj)
         {
+            // 获取当前登录用户名
+            string _currentUserName = CommonService.GetCurrentUser(HttpContext).UserName;
             ResultObj resultObj = new ResultObj();
 
             var obj = _context.User.Find(newObj.UserId);
@@ -235,7 +226,7 @@ namespace CityGasWebApi.Controllers
                 return resultObj;
             }
 
-            if (IsExistSameName(newObj))
+            if (IsExistSame(newObj))
             {
                 resultObj.IsSuccess = false;
                 resultObj.ErrMsg = "该登录名已存在。";
@@ -255,7 +246,7 @@ namespace CityGasWebApi.Controllers
             obj.Remark = newObj.Remark;
 
             obj.LastUpdateTime = DateTime.Now;
-            obj.LastUpdateUser = GetCurrentUser().Value.UserName; 
+            obj.LastUpdateUser = _currentUserName; 
 
             _context.User.Update(obj);
             _context.SaveChanges();
@@ -269,6 +260,8 @@ namespace CityGasWebApi.Controllers
         [HttpPost]
         public IActionResult Delete(DelObj delObj)
         {
+            // 获取当前登录用户名
+            string _currentUserName = CommonService.GetCurrentUser(HttpContext).UserName;
             for (int i = 0; i < delObj.Id.Count(); i++)
             {
                 var obj = _context.User.Find(delObj.Id[i]);
@@ -277,7 +270,7 @@ namespace CityGasWebApi.Controllers
                     return NotFound();
                 }
                 // 系统管理员或者自己不可以删除
-                if ( !(obj.UserName.Equals("admin") || obj.UserName.Equals(GetCurrentUser().Value.UserName)))
+                if ( !(obj.UserName.Equals("admin") || obj.UserName.Equals(_currentUserName)))
                 {
                     _context.User.Remove(obj);
                     _context.SaveChanges();

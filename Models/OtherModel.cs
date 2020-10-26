@@ -1,4 +1,5 @@
 ﻿using CityGasWebApi.Models.Archives;
+using CityGasWebApi.Models.Work;
 using System;
 using System.Collections.Generic;
 
@@ -19,6 +20,19 @@ namespace CityGasWebApi.Models
     public class DeviceView : Device
     {
         public string InspectName { get; set; }
+    }
+
+    public class WorkTicketView : WorkTicket
+    {
+        public string LoadStationName { get; set; }
+        public string LoadStationBranch { get; set; }
+        public string LoadStationDistrict { get; set; }
+        public string UnloadStationName { get; set; }
+        public string UnloadStationBranch { get; set; }
+        public string UnloadStationDistrict { get; set; }
+
+        public string TruckNo { get; set; }
+        public string DrvierName { get; set; }
     }
 
     /// <summary>

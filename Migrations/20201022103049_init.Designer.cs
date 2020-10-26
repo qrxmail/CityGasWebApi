@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CityGasWebApi.Migrations
 {
     [DbContext(typeof(CityGasContext))]
-    [Migration("20201021032547_addUser")]
-    partial class addUser
+    [Migration("20201022103049_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -161,6 +161,138 @@ namespace CityGasWebApi.Migrations
                     b.ToTable("Device");
                 });
 
+            modelBuilder.Entity("CityGasWebApi.Models.BaseInfo.Driver", b =>
+                {
+                    b.Property<Guid>("PK")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Company")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("CreateUser")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("LastUpdateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("LastUpdateUser")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Remark")
+                        .HasColumnType("text");
+
+                    b.HasKey("PK");
+
+                    b.ToTable("Driver");
+                });
+
+            modelBuilder.Entity("CityGasWebApi.Models.BaseInfo.OilStation", b =>
+                {
+                    b.Property<Guid>("PK")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("CreateUser")
+                        .HasColumnType("text");
+
+                    b.Property<string>("District")
+                        .HasColumnType("text");
+
+                    b.Property<string>("HMIIP")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("LastUpdateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("LastUpdateUser")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Latitude")
+                        .HasColumnType("text");
+
+                    b.Property<float>("LevelCalcFactor")
+                        .HasColumnType("real");
+
+                    b.Property<float>("LevelCalcOffset")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Longitude")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PLCIP")
+                        .HasColumnType("text");
+
+                    b.Property<float>("PumpCalcFactor")
+                        .HasColumnType("real");
+
+                    b.Property<float>("PumpCalcOffset")
+                        .HasColumnType("real");
+
+                    b.Property<float>("PumpRatedFlow")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Remark")
+                        .HasColumnType("text");
+
+                    b.Property<float>("VolumnPer1cm")
+                        .HasColumnType("real");
+
+                    b.HasKey("PK");
+
+                    b.ToTable("OilStation");
+                });
+
+            modelBuilder.Entity("CityGasWebApi.Models.BaseInfo.Truck", b =>
+                {
+                    b.Property<Guid>("PK")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Company")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("CreateUser")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("LastUpdateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("LastUpdateUser")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LeadSealNumber")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Number")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Remark")
+                        .HasColumnType("text");
+
+                    b.Property<float>("Volumn")
+                        .HasColumnType("real");
+
+                    b.HasKey("PK");
+
+                    b.ToTable("Truck");
+                });
+
             modelBuilder.Entity("CityGasWebApi.Models.User", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -189,6 +321,9 @@ namespace CityGasWebApi.Migrations
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("LastUpdateUser")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Mobile")
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
