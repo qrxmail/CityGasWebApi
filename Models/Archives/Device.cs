@@ -236,5 +236,8 @@ namespace CityGasWebApi.Models.Archives
       
     }
 
-    
+    public class DeviceView : Device
+    {
+        public string InspectName { get; set; }
+    }
 }

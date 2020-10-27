@@ -89,4 +89,18 @@ namespace CityGasWebApi.Models.Work
     }
 
     public enum WorkTicketStatus { 待接单, 待授权, 待拉油, 待卸油, 待审批, 已完成, 已作废, 已删除 }
+
+    public class WorkTicketView : WorkTicket
+    {
+        public string LoadStationName { get; set; }
+        public string LoadStationBranch { get; set; }
+        public string LoadStationDistrict { get; set; }
+        public string UnloadStationName { get; set; }
+        public string UnloadStationBranch { get; set; }
+        public string UnloadStationDistrict { get; set; }
+
+        public string TruckNo { get; set; }
+        public string TruckCompany { get; set; }
+        public string DrvierName { get; set; }
+    }
 }
