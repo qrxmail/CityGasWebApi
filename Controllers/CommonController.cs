@@ -15,7 +15,7 @@ namespace CityGasWebApi.Controllers
             _context = context;
         }
 
-        // 获取站点数据（下拉选框数据）
+        // 获取站点数据（下拉选框数据：所属单位Branch、管理区District、站名Name）
         [Route("getOilStation")]
         public dynamic GetOilStation()
         {
@@ -26,15 +26,15 @@ namespace CityGasWebApi.Controllers
                              {
                                  Label = a.Key.Branch,
                                  Value = a.Key.Branch,
-                                 Children = from b in stationData.Where(p => p.Branch.Equals(a.Key.Branch)).GroupBy(t => new { t.Name })
+                                 Children = from b in stationData.Where(p => p.Branch.Equals(a.Key.Branch)).GroupBy(t => new { t.District })
                                             select new
                                             {
-                                                Label = b.Key.Name,
-                                                Value = b.Key.Name,
-                                                Children = from c in stationData.Where(p => p.Name.Equals(b.Key.Name)).GroupBy(t => new { t.District, t.PK })
+                                                Label = b.Key.District,
+                                                Value = b.Key.District,
+                                                Children = from c in stationData.Where(p => p.District.Equals(b.Key.District)).GroupBy(t => new { t.Name, t.PK })
                                                            select new
                                                            {
-                                                               Label = c.Key.District,
+                                                               Label = c.Key.Name,
                                                                Value = c.Key.PK,
                                                            }
                                             }

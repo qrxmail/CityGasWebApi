@@ -17,6 +17,8 @@ namespace CityGasWebApi.Models.Work
 
         public string SerialNumber { get; set; }
 
+        public float OilLoadedMax { get; set; }
+
         public string SubSerialNumber { get; set; }
 
         public string CarNumber { get; set; }

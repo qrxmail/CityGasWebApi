@@ -63,6 +63,7 @@ namespace CityGasWebApi.Controllers.Work
                              PK = work.PK,
                              LoadStation = work.LoadStation,
                              UnloadStation = work.UnloadStation,
+                             OilLoadedMax = work.OilLoadedMax,
                              SerialNumber = work.SerialNumber,
                              SubSerialNumber = work.SubSerialNumber,
                              CarNumber = work.CarNumber,
@@ -375,7 +376,7 @@ namespace CityGasWebApi.Controllers.Work
             }
             obj.Status = WorkTicketStatus.待接单.ToString();
             obj.IsDeleted = false;
-            obj.Description = obj.Description + "\n【创建工单】操作人：" + _currentUserName + "，时间：" + DateTime.Now;
+            obj.Description = obj.Description + "【创建工单】操作人：" + _currentUserName + "，时间：" + DateTime.Now;
             obj.CreateUser = _currentUserName;
             obj.CreateTime = DateTime.Now;
             obj.LastUpdateUser = obj.LastUpdateUser;
@@ -418,6 +419,7 @@ namespace CityGasWebApi.Controllers.Work
             obj.LoadingBeginTime = newObj.LoadingBeginTime;
             obj.LoadingEndTime = newObj.LoadingEndTime;
             obj.UnloadStation = newObj.UnloadStation;
+            obj.OilLoadedMax = newObj.OilLoadedMax;
             obj.Remark = newObj.Remark;
             obj.Description = obj.Description + "\n【修改工单】操作人：" + _currentUserName + "，时间：" + DateTime.Now;
 
