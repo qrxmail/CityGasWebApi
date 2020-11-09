@@ -27,5 +27,11 @@
     <PackageReference Include="NPOI" Version="2.5.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Xamarin.Forms.Core">
+      <HintPath>C:\Microsoft\Xamarin\NuGet\xamarin.forms\4.6.0.1141\lib\Xamarin.iOS10\Xamarin.Forms.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 
 </Project>

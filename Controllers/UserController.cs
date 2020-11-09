@@ -52,9 +52,9 @@ namespace CityGasWebApi.Controllers
                 var loginUserBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(loginUser));
                 HttpContext.Session.Set("currentUser", loginUserBytes);
             }
-            
+
             else
-            {  
+            {
                 loginUser.Status = "error";
                 loginUser.Type = "account";
                 loginUser.CurrentAuthority = "guest";
@@ -246,7 +246,7 @@ namespace CityGasWebApi.Controllers
             obj.Remark = newObj.Remark;
 
             obj.LastUpdateTime = DateTime.Now;
-            obj.LastUpdateUser = _currentUserName; 
+            obj.LastUpdateUser = _currentUserName;
 
             _context.User.Update(obj);
             _context.SaveChanges();
@@ -270,7 +270,7 @@ namespace CityGasWebApi.Controllers
                     return NotFound();
                 }
                 // 系统管理员或者自己不可以删除
-                if ( !(obj.UserName.Equals("admin") || obj.UserName.Equals(_currentUserName)))
+                if (!(obj.UserName.Equals("admin") || obj.UserName.Equals(_currentUserName)))
                 {
                     _context.User.Remove(obj);
                     _context.SaveChanges();
@@ -278,6 +278,32 @@ namespace CityGasWebApi.Controllers
             }
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// 获取通知
+        /// </summary>
+        /// <returns></returns>
+        [Route("notices")]
+        [HttpGet]
+        public dynamic GetNotices()
+        {
+            var list = new JArray();
+            var data = new
+            {
+                id = "000000001",
+                title = "任务名称",
+                description = "任务需要在 2020-12-12 20:00 前启动",
+                extra = "未开始",
+                status = "todo",
+                type = "event"
+            };
+            var str = JsonConvert.SerializeObject(data);
+            var obj = JObject.Parse(str);
+            obj["key"] = 1;
+            obj.Add("key2", "1");
+            list.Add(obj);
+            return list.ToString();
         }
 
         /// <summary>
@@ -308,7 +334,10 @@ namespace CityGasWebApi.Controllers
             menus.menuData = menuDatas;
             return menus;
         }
+
+
     }
+
 
     /// <summary>
     /// 菜单模型
