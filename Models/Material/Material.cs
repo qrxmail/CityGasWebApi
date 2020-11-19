@@ -55,6 +55,11 @@ namespace CityGasWebApi.Models.Material
         public string CheckState { get; set; }
 
         /// <summary>
+        /// 审核人
+        /// </summary>
+        public string CheckUser { get; set; }
+
+        /// <summary>
         /// 备注
         /// </summary>
         public string Remark { get; set; }
