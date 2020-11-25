@@ -16,36 +16,38 @@ $(function () {
     time();
     setInterval("time()", 1000);
 
-    // 待办任务数据设置
-    setTaskData();
+    $.getJSON("data.json", result => {
+        // 待办任务数据设置
+        setTaskData(result.taskData);
 
-    // 操作统计数据设置
-    setStatDataOper();
+        // 操作统计数据设置
+        setStatDataOper(result.operData);
 
-    // 雷达图表
-    setChartLeiDa();
+        // 雷达图表
+        setChartLeiDa(result.leidaData);
 
-    // 柱状图表
-    setChartZhuZhuang();
+        // 柱状图表
+        setChartZhuZhuang(result.chartZhuZhuangData);
 
-    // 仪表盘图表
-    setChartYiBiao();
+        // 仪表盘图表
+        setChartYiBiao(result.chartYiBiaoData);
 
-    // 故障处理表格
-    setBugData();
+        // 故障处理表格
+        setBugData(result.bugData);
 
-    // 折线图表
-    setChartZheXian();
+        // 折线图表
+        setChartZheXian(result.chartZheXianData);
 
-    //设备数量及价值统计数据设置
-    setStatDataDevice();
+        //设备数量及价值统计数据设置
+        setStatDataDevice(result.statDataDevice);
 
-    // 环形图表：设备数量，价值占比统计
-    setChartHuanXing();
+        // 环形图表：设备数量，价值占比统计
+        setChartHuanXing(result.chartHuanXingData);
 
-    // 地图图表：设备数据
-    setChartDiTu();
+        // 地图图表：设备数据
+        setChartDiTu(result.chartDiTuData);
 
+    });
 });
 
 // 窗体改变大小事件
@@ -114,19 +116,12 @@ function time() {
 };
 
 // 设置待办任务数据
-function setTaskData() {
-    // 任务数据
-    var data = [
-        { name: "检修", user: "李四", branch: "白水分公司", state: "待处理" },
-        { name: "检修", user: "李四", branch: "白水分公司", state: "待处理" },
-        { name: "检修", user: "李四", branch: "白水分公司", state: "待处理" },
-        { name: "检修", user: "李四", branch: "白水分公司", state: "待处理" },
-        { name: "检修", user: "李四", branch: "白水分公司", state: "待处理" }];
+function setTaskData(data) {
     var htmlStr = "";
     for (var i = 0; i < data.length; i++) {
         htmlStr += '<tr>' +
             '<td style = "width:70px;padding: 7px 8px;" >' + data[i].name + '</td>' +
-            '<td style="width:110px;padding: 7px 8px;">' + data[i].user + '</td>' +
+            '<td style = "width:110px;padding: 7px 8px;">' + data[i].user + '</td>' +
             '<td style = "width:120px;padding: 7px 8px;" > ' + data[i].state + '</td> ' +
             '<td style = "width:100px;padding: 7px 8px;" > ' + data[i].branch + '</td> ' +
             '</tr>';
@@ -135,19 +130,19 @@ function setTaskData() {
 }
 
 // 设置操作统计数据
-function setStatDataOper() {
+function setStatDataOper(data) {
     // 未处理保修
-    $("#divbaoxiu").html(92);
+    $("#divbaoxiu").html(data.baoxiu);
     // 今日报修
-    $("#divjinribaoxiu").html(83);
+    $("#divjinribaoxiu").html(data.jinribaoxiu);
     // 故障数
-    $("#divguzhang").html(56);
+    $("#divguzhang").html(data.guzhang);
     // 完成任务数
-    $("#divwanchengrenwu").html(72);
+    $("#divwanchengrenwu").html(data.wanchengrenwu);
 }
 
 // 雷达图表
-function setChartLeiDa() {
+function setChartLeiDa(data) {
 
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.getElementById('left1'));
@@ -207,7 +202,7 @@ function setChartLeiDa() {
             },
             data: [
                 {
-                    value: [100, 98, 88, 90, 50, 60],
+                    value: data,
                     name: '百分比（%）'
                 },
             ]
@@ -219,7 +214,7 @@ function setChartLeiDa() {
 }
 
 // 柱状图表
-function setChartZhuZhuang() {
+function setChartZhuZhuang(data) {
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.getElementById('left2'));
 
@@ -240,7 +235,7 @@ function setChartZhuZhuang() {
         //    data: ['销量']
         //},
         xAxis: {
-            data: ["泄露", "缺油", "进水", "短路", "短路1", "短路2", "短路3", "短路4"],
+            data: data.xAxisData,
             axisLabel: {
                 show: true,
                 textStyle: {
@@ -273,7 +268,7 @@ function setChartZhuZhuang() {
                         color: '#83bff6',
                     }
                 },
-                data: [120, 115, 100, 50, 80, 90, 20, 10]
+                data: data.seriesData,
             }
         ]
     };
@@ -283,7 +278,7 @@ function setChartZhuZhuang() {
 }
 
 // 仪表盘图表
-function setChartYiBiao() {
+function setChartYiBiao(data) {
     // 基于准备好的dom，初始化echarts实例
     var myChart1 = echarts.init(document.getElementById('left3'));
     var myChart2 = echarts.init(document.getElementById('left4'));
@@ -363,32 +358,25 @@ function setChartYiBiao() {
         ]
     };
     // 使用刚指定的配置项和数据显示图表。
-    option.series[0].data = [{ value: 98 }];
-    option.series[0].name = "完好率";
+    option.series[0].data = data.y1.data;
+    option.series[0].name = data.y1.name;
     myChart1.setOption(option);
     // 使用刚指定的配置项和数据显示图表。
-    option.series[0].data = [{ value: 12 }];
-    option.series[0].name = "泄露率";
+    option.series[0].data = data.y2.data;
+    option.series[0].name = data.y2.name;
     myChart2.setOption(option);
     // 使用刚指定的配置项和数据显示图表。
-    option.series[0].data = [{ value: 90 }];
-    option.series[0].name = "利用率";
+    option.series[0].data = data.y3.data;
+    option.series[0].name = data.y3.name;
     myChart3.setOption(option);
     // 使用刚指定的配置项和数据显示图表。
-    option.series[0].data = [{ value: 10 }];
-    option.series[0].name = "故障率";
+    option.series[0].data = data.y4.data;
+    option.series[0].name = data.y4.name;
     myChart4.setOption(option);
 }
 
 // 故障处理表格数据设置
-function setBugData() {
-    // 任务数据
-    var data = [
-        { deviceName: "压缩机", no: "50022", user: "张三", time: "2020-08-21 14:00", level: "严重", state: "待分配", timelen: "30" },
-        { deviceName: "压缩机", no: "50022", user: "张三", time: "2020-08-21 14:00", level: "严重", state: "待分配", timelen: "30" },
-        { deviceName: "压缩机", no: "50022", user: "张三", time: "2020-08-21 14:00", level: "严重", state: "待分配", timelen: "30" },
-        { deviceName: "压缩机", no: "50022", user: "张三", time: "2020-08-21 14:00", level: "严重", state: "待分配", timelen: "30" },
-        { deviceName: "压缩机", no: "50022", user: "张三", time: "2020-08-21 14:00", level: "严重", state: "待分配", timelen: "30" }];
+function setBugData(data) {
     var htmlStr = "";
     for (var i = 0; i < data.length; i++) {
         htmlStr += '<tr>' +
@@ -405,7 +393,7 @@ function setBugData() {
 }
 
 // 折线图表
-function setChartZheXian() {
+function setChartZheXian(data) {
     // 基于准备好的dom，初始化echarts实例
     var myChart1 = echarts.init(document.getElementById('right1'));
     var myChart2 = echarts.init(document.getElementById('right2'));
@@ -441,7 +429,7 @@ function setChartZheXian() {
                     width: '1'
                 }
             },
-            data: ['7/22', '7/23', '7/24', '7/25', '7/26', '7/27', '7/28', '7/29', '7/30', '8/1']
+            data: data.xAxisData,
         },
         yAxis: {
             type: 'value',
@@ -485,21 +473,21 @@ function setChartZheXian() {
 
     // 使用刚指定的配置项和数据显示图表。
     option.title.text = "";
-    option.series[0].data = [0, 2, 4, 6, 3, 6, 3, 5, 7, 8];
+    option.series[0].data = data.seriesData1; //[0, 2, 4, 6, 3, 6, 3, 5, 7, 8];
     option.series[0].areaStyle = { color: "rgba(22,212,229, 0.3)" };
     option.series[0].lineStyle = { color: "rgba(22,212,229, 1)" };
     option.series[0].itemStyle = { color: "rgba(22,212,229, 1)" };
     myChart1.setOption(option);
 
     option.title.text = "";
-    option.series[0].data = [0, 20, 14, 26, 31, 61, 31, 52, 71, 78];
+    option.series[0].data = data.seriesData2; //[0, 20, 14, 26, 31, 61, 31, 52, 71, 78];
     option.series[0].areaStyle = { color: "rgba(255,235,123, 0.3)" };
     option.series[0].lineStyle = { color: "rgba(255,235,123, 1)" };
     option.series[0].itemStyle = { color: "rgba(255,235,123, 1)" };
     myChart2.setOption(option);
 
     option.title.text = "";
-    option.series[0].data = [10, 20, 51, 20, 72, 49, 10, 51, 72, 81];
+    option.series[0].data = data.seriesData3; //[10, 20, 51, 20, 72, 49, 10, 51, 72, 81];
     option.series[0].areaStyle = { color: "rgba(107,139,243, 0.3)" };
     option.series[0].lineStyle = { color: "rgba(107,139,243, 1)" };
     option.series[0].itemStyle = { color: "rgba(107,139,243, 1)" };
@@ -507,15 +495,15 @@ function setChartZheXian() {
 }
 
 //设备数量及价值统计数据设置
-function setStatDataDevice() {
-    $("#divdevicenum").html('312,35');
-    $("#divdevicecost").html('888,920');
-    $("#divdevicenumnow").html('232');
-    $("#divdevicecostnow").html('456.888');
+function setStatDataDevice(data) {
+    $("#divdevicenum").html(data.devicenum);
+    $("#divdevicecost").html(data.devicecost);
+    $("#divdevicenumnow").html(data.devicenumnow);
+    $("#divdevicecostnow").html(data.devicecostnow);
 }
 
 // 环形图表：设备数量，价值占比统计
-function setChartHuanXing() {
+function setChartHuanXing(data) {
     // 基于准备好的dom，初始化echarts实例
     var myChart1 = echarts.init(document.getElementById('pie1'));
     var myChart2 = echarts.init(document.getElementById('pie2'));
@@ -596,51 +584,21 @@ function setChartHuanXing() {
     };
 
     // 使用刚指定的配置项和数据显示图表。
-    option.graphic[0].style.text = "45.24";
+    option.graphic[0].style.text = "37.50";
     option.graphic[0].style.fill = "#1DD6E5";
     option.series[0].name = "数量占比";
-    option.series[0].data = [
-        {
-            value: 100,
-            name: '原数量',
-            itemStyle: {
-                color: "#1DD6E5",
-            }
-        },
-        {
-            value: 60,
-            name: '新增数量',
-            itemStyle: {
-                color: "#0194FF",
-            }
-        },
-    ];
+    option.series[0].data = data.seriesData1;
     myChart1.setOption(option);
 
-    option.graphic[0].style.text = "64.29";
+    option.graphic[0].style.text = "23.08";
     option.graphic[0].style.fill = "#FCB760";
     option.series[0].name = "价值占比";
-    option.series[0].data = [
-        {
-            value: 100,
-            name: '原有价值',
-            itemStyle: {
-                color: "#FCB760",
-            }
-        },
-        {
-            value: 30,
-            name: '新增价值',
-            itemStyle: {
-                color: "#F94303",
-            }
-        },
-    ];
+    option.series[0].data = data.seriesData2;
     myChart2.setOption(option);
 }
 
 // 地图图表：设备数据
-function setChartDiTu() {
+function setChartDiTu(data) {
     // 基于准备好的dom，初始化echarts实例
     var chart = echarts.init(document.getElementById('map'));
     chart.setOption({
@@ -676,18 +634,7 @@ function setChartDiTu() {
                     show: true,
                 }
             },
-            data: [
-                { name: '榆林市', value: 200 },
-                { name: '延安市', value: 300 },
-                { name: '渭南市', value: 300 },
-                { name: '西安市', value: 300 },
-                { name: '安康市', value: 300 },
-                { name: '宝鸡市', value: 300 },
-                { name: '汉中市', value: 300 },
-                { name: '咸阳市', value: 300 },
-                { name: '商洛市', value: 300 },
-                { name: '铜川市', value: 300 },
-            ],
+            data: data
         }]
     });
 }
