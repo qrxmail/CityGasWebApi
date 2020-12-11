@@ -3,14 +3,16 @@ using System;
 using CityGasWebApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CityGasWebApi.Migrations
 {
     [DbContext(typeof(CityGasContext))]
-    partial class CityGasContextModelSnapshot : ModelSnapshot
+    [Migration("20201210093556_initmysql")]
+    partial class initmysql
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

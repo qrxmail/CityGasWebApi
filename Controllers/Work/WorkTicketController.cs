@@ -54,10 +54,10 @@ namespace CityGasWebApi.Controllers.Work
                          from sta in station.DefaultIfEmpty()
                          join unStation in _context.OilStation on work.UnloadStation equals unStation.PK.ToString() into unStation
                          from unsta in unStation.DefaultIfEmpty()
-                         join truck in _context.Truck on work.CarNumber equals truck.PK.ToString() into truck
-                         from tru in truck.DefaultIfEmpty()
-                         join drvier in _context.Driver on work.Driver equals drvier.PK.ToString() into driver
-                         from drv in driver.DefaultIfEmpty()
+                         //join truck in _context.Truck on work.CarNumber equals truck.PK.ToString() into truck
+                         //from tru in truck.DefaultIfEmpty()
+                         //join drvier in _context.Driver on work.Driver equals drvier.PK.ToString() into driver
+                         //from drv in driver.DefaultIfEmpty()
                          select new WorkTicketView
                          {
                              PK = work.PK,
@@ -97,9 +97,9 @@ namespace CityGasWebApi.Controllers.Work
                              UnloadStationName = unsta.Name,
                              UnloadStationBranch = unsta.Branch,
                              UnloadStationDistrict = unsta.District,
-                             TruckNo = tru.Number,
-                             TruckCompany = tru.Company,
-                             DrvierName = drv.Name,
+                             //TruckNo = tru.Number,
+                             //TruckCompany = tru.Company,
+                             //DrvierName = drv.Name,
                          }).Where(p => p.IsDeleted == false);
             
             if (string.IsNullOrEmpty(serialNumber) == false)
@@ -374,7 +374,8 @@ namespace CityGasWebApi.Controllers.Work
                 resultObj.ErrMsg = "该工单编号已存在。";
                 return resultObj;
             }
-            obj.Status = WorkTicketStatus.待接单.ToString();
+            //obj.Status = WorkTicketStatus.待接单.ToString();
+            obj.Status = WorkTicketStatus.待拉油.ToString();
             obj.IsDeleted = false;
             obj.Description = obj.Description + "【创建工单】操作人：" + _currentUserName + "，时间：" + DateTime.Now;
             obj.CreateUser = _currentUserName;
@@ -420,6 +421,8 @@ namespace CityGasWebApi.Controllers.Work
             obj.LoadingEndTime = newObj.LoadingEndTime;
             obj.UnloadStation = newObj.UnloadStation;
             obj.OilLoadedMax = newObj.OilLoadedMax;
+            obj.CarNumber = newObj.CarNumber;
+            obj.Driver = newObj.Driver;
             obj.Remark = newObj.Remark;
             obj.Description = obj.Description + "\n【修改工单】操作人：" + _currentUserName + "，时间：" + DateTime.Now;
 

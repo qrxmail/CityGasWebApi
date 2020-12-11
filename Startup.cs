@@ -31,7 +31,9 @@ namespace CityGasWebApi
             services.AddMvc(options => { options.EnableEndpointRouting = false; });
 
             // 使用PostgreSql数据库
-            services.AddDbContext<CityGasContext>(option => option.UseNpgsql(Configuration.GetConnectionString("PostgreSql")));
+            //services.AddDbContext<CityGasContext>(option => option.UseNpgsql(Configuration.GetConnectionString("PostgreSql")));
+            // 使用PostgreSql数据库
+            services.AddDbContext<CityGasContext>(option => option.UseMySql(Configuration.GetConnectionString("MySql")));
 
             // 解决时间少8小时的问题
             services.AddControllers().AddJsonOptions(opt =>

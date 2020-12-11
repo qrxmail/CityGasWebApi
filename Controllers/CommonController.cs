@@ -47,14 +47,20 @@ namespace CityGasWebApi.Controllers
         [Route("getDriver")]
         public dynamic GetDriver()
         {
-            var data = _context.Driver.ToList();
+            //var data = _context.Driver.ToList();
 
-            var query = from a in data
+            //var query = from a in data
+            //            select new
+            //                 {
+            //                     Text = a.Name,
+            //                     Value = a.PK,
+            //                 };
+            var query = from a in _context.WorkTicket.GroupBy(t => new { t.Driver })
                         select new
-                             {
-                                 Text = a.Name,
-                                 Value = a.PK,
-                             };
+                        {
+                            Text = a.Key.Driver,
+                            Value = a.Key.Driver,
+                        };
 
             return query.ToList();
         }
@@ -63,15 +69,20 @@ namespace CityGasWebApi.Controllers
         [Route("getTruck")]
         public dynamic GetTruck()
         {
-            var data = _context.Truck.ToList();
+            //var data = _context.Truck.ToList();
 
-            var query = from a in data
+            //var query = from a in data
+            //            select new
+            //            {
+            //                Text = a.Number,
+            //                Value = a.PK,
+            //            };
+            var query = from a in _context.WorkTicket.GroupBy(t => new { t.CarNumber })
                         select new
                         {
-                            Text = a.Number,
-                            Value = a.PK,
+                            Text = a.Key.CarNumber,
+                            Value = a.Key.CarNumber,
                         };
-
             return query.ToList();
         }
 
