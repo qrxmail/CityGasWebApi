@@ -11,7 +11,6 @@ namespace CityGasWebApi.Models
         {
 
         }
-        public DbSet<Device> Device { get; set; }
 
         public DbSet<User> User { get; set; }
         public DbSet<Driver> Driver { get; set; }
